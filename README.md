@@ -28,9 +28,25 @@ Com bugs propositais: `BUGS_ENABLED=BUG-01 npm run ambiente:subir`.
 | --- | --- | --- |
 | Fumaça | `tests/api/fumaca.spec.js` | Ambiente, seed e contrato publicados |
 | Acesso | `tests/api/acesso/` | RN-01, RN-02, RN-03, RN-04, RN-21, login e gestão de usuários |
+| Estoque | `tests/api/estoque/` | RN-05, RN-06, RN-07, RN-01 aplicado a insumos, cadastro e validação de nota |
 
 Cada teste traz a regra no título (`@RN-03`), então dá para rodar uma regra só: `npx playwright test --grep @RN-03`.
 
+## Dados de teste
+
+O seed da API é usado **só para leitura** (personas, fazendas e o insumo da Rio Verde). Todo teste que altera estoque cria o próprio insumo pela API. Assim os testes rodam em paralelo, em qualquer ordem e repetidos, sem refazer o seed.
+
+## Prova de que a suíte encontra defeitos
+
+| Ambiente | Testes `@BUG-01` | Demais testes |
+| --- | --- | --- |
+| `BUGS_ENABLED=false` | passam | passam |
+| `BUGS_ENABLED=BUG-01` | **falham** | passam |
+
+    BUGS_ENABLED=BUG-01 npm run ambiente:subir
+    npx playwright test --grep @BUG-01      # tem que falhar
+    npm run ambiente:subir                  # volta sem bugs
+
 ## Status
 
-Fase 2: suíte de acesso concluída (45 testes; 1 pendente para a v0.3 da API).
+Fase 3: suítes de acesso e estoque concluídas (92 testes; 1 pendente para a v0.3 da API).

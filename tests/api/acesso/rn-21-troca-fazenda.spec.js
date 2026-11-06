@@ -35,7 +35,7 @@ test.describe('RN-21 — troca de fazenda', () => {
     expect(atual.nome).toBe('Fazenda Rio Verde');
   });
 
-  test('depois da troca, nenhum dado da fazenda anterior aparece @RN-21 @RN-01', async ({ request }) => {
+  test('depois da troca, nenhum dado da fazenda anterior aparece @RN-21 @RN-01 @BUG-01', async ({ request }) => {
     const juliana = await login(request, 'juliana');
     const antes = await (await request.get('/insumos', comToken(juliana.token))).json();
     expect(antes.length).toBeGreaterThan(0);
