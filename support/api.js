@@ -22,4 +22,16 @@ async function esperarErro(resposta, status, codigo) {
   return corpo;
 }
 
-module.exports = { login, comToken, esperarErro };
+// IDs das fazendas do seed, lidos do login da Juliana (a única persona com vínculo nas duas)
+async function idsDasFazendas(request) {
+  const { fazendas } = await login(request, 'juliana');
+  const id = (nome) => fazendas.find((f) => f.nome === nome).id;
+  return { boaSafra: id('Fazenda Boa Safra'), rioVerde: id('Fazenda Rio Verde') };
+}
+
+// E-mail único por execução: testes que criam usuários não colidem entre si nem com o seed
+function emailUnico(prefixo = 'qa') {
+  return `${prefixo}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@agrogest.test`;
+}
+
+module.exports = { login, comToken, esperarErro, idsDasFazendas, emailUnico };

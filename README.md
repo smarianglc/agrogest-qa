@@ -22,6 +22,15 @@ Requisitos: Node 20+ e Docker Desktop.
 Outra versão da API: `API_VERSION=0.1.0 npm run ambiente:subir`.
 Com bugs propositais: `BUGS_ENABLED=BUG-01 npm run ambiente:subir`.
 
+## Suítes
+
+| Suíte | Pasta | Regras |
+| --- | --- | --- |
+| Fumaça | `tests/api/fumaca.spec.js` | Ambiente, seed e contrato publicados |
+| Acesso | `tests/api/acesso/` | RN-01, RN-02, RN-03, RN-04, RN-21, login e gestão de usuários |
+
+Cada teste traz a regra no título (`@RN-03`), então dá para rodar uma regra só: `npx playwright test --grep @RN-03`.
+
 ## Status
 
-Fase 1: ambiente e teste de fumaça.
+Fase 2: suíte de acesso concluída (45 testes; 1 pendente para a v0.3 da API).
