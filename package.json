@@ -1,0 +1,25 @@
+{
+  "name": "agrogest-qa",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Framework de testes do portfólio de QA (AgroGest fictícia)",
+  "type": "commonjs",
+  "scripts": {
+    "ambiente:subir": "docker compose up -d --wait && npm run ambiente:seed",
+    "ambiente:seed": "docker compose exec -T api npx prisma db seed",
+    "ambiente:descer": "docker compose down -v",
+    "test": "playwright test",
+    "test:relatorio": "playwright show-report"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smarianglc/agrogest-qa.git"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.65.0"
+  }
+}

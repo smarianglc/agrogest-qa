@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log
+
+# Variáveis de ambiente: nunca vão para o Git (só o .env.example)
+.env
+.env.*
+!.env.example
+
+# Saídas do Playwright (o relatório vai como artefato do CI, não para o Git)
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+.DS_Store

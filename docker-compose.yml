@@ -1,0 +1,38 @@
+# Ambiente de teste da AgroGest: sobe a IMAGEM PUBLICADA da API (não o código-fonte).
+# A versão testada é escolhida por API_VERSION; os bugs propositais, por BUGS_ENABLED.
+name: agrogest-qa
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: agrogest
+      POSTGRES_PASSWORD: agrogest
+      POSTGRES_DB: agrogest
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agrogest -d agrogest"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    image: ghcr.io/smarianglc/agrogest-api:${API_VERSION:-0.1.1}
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgresql://agrogest:agrogest@db:5432/agrogest
+      # Segredo só do ambiente de teste: os testes usam o mesmo valor para gerar tokens expirados (RN-03)
+      JWT_SECRET: ${JWT_SECRET:-segredo-do-ambiente-de-teste}
+      JWT_EXPIRES_IN: 1h
+      BUGS_ENABLED: "${BUGS_ENABLED:-false}"
+    ports:
+      - "3100:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
