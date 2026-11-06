@@ -34,6 +34,14 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+      - name: Rastreabilidade atualizada
+        run: |
+          npm run rastreabilidade
+          if ! git diff --exit-code docs/rastreabilidade.md; then
+            echo "::error::docs/rastreabilidade.md está desatualizado: rode 'npm run rastreabilidade' e faça commit"
+            exit 1
+          fi
+
       - name: Subir ambiente com a API ${{ env.API_VERSION }}
         run: docker compose up -d --wait
 

@@ -9,7 +9,8 @@
     "ambiente:seed": "docker compose exec -T api npx prisma db seed",
     "ambiente:descer": "docker compose down -v",
     "test": "playwright test",
-    "test:relatorio": "playwright show-report"
+    "test:relatorio": "playwright show-report",
+    "rastreabilidade": "node scripts/rastreabilidade.js"
   },
   "engines": {
     "node": ">=20"

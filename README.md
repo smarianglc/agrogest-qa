@@ -6,6 +6,14 @@ Framework de testes da AgroGest, uma empresa **fictícia** criada para um portf�
 
 Os testes rodam contra a **imagem publicada** da API (`ghcr.io/smarianglc/agrogest-api`), nunca contra o código-fonte, como num time real: cada execução diz exatamente qual versão foi testada.
 
+## Documentos de qualidade
+
+| Documento | Conteúdo |
+| --- | --- |
+| [Estratégia de testes](docs/estrategia-de-testes.md) | Problema, objetivos, abordagem, ambiente e dados, critério de go/no-go e indicadores |
+| [Matriz de risco](docs/matriz-de-risco.md) | Riscos por probabilidade × impacto, riscos aceitos (RA-XX) e lacunas conhecidas |
+| [Rastreabilidade](docs/rastreabilidade.md) | Regra → testes → situação, **gerada a partir do código** (`npm run rastreabilidade`) |
+
 ## Stack
 
 - Playwright Test (JavaScript) para os testes de API
@@ -62,4 +70,4 @@ Os relatórios HTML de cada execução ficam como artefatos do workflow por 30 d
 
 ## Status
 
-Fase 4: suítes de acesso e estoque (92 testes; 1 pendente para a v0.3 da API) rodando no CI com prova de bugs.
+v0.1 concluída: suítes de acesso e estoque (92 testes; 1 pendente para a v0.3 da API), CI com prova de bugs e documentos de estratégia, risco e rastreabilidade.
