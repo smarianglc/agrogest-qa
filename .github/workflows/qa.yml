@@ -1,0 +1,132 @@
+name: QA
+
+# Roda a suíte contra a IMAGEM PUBLICADA da API, numa versão exata.
+# Dois jobs: a regressão (tudo tem que passar) e a prova de bugs (o teste do bug tem que falhar).
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      api_version:
+        description: "Versão da imagem da API a testar, por exemplo 0.1.1"
+        required: true
+        default: "0.1.1"
+
+permissions:
+  contents: read
+
+env:
+  API_VERSION: ${{ inputs.api_version || '0.1.1' }}
+
+jobs:
+  regressao:
+    name: Regressão (sem bugs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Subir ambiente com a API ${{ env.API_VERSION }}
+        run: docker compose up -d --wait
+
+      - name: Rodar o seed
+        run: npm run ambiente:seed
+
+      - name: Rodar a suíte completa
+        run: npx playwright test
+
+      - name: Mostrar logs se falhar
+        if: failure()
+        run: docker compose logs
+
+      - name: Guardar o relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-regressao-api-${{ env.API_VERSION }}
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Derrubar ambiente
+        if: always()
+        run: docker compose down -v
+
+  prova-de-bugs:
+    name: Prova de bugs (${{ matrix.bug }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Na v0.2 entram BUG-02, BUG-04 e BUG-05; cada um vira uma linha aqui
+        bug: [BUG-01]
+    env:
+      BUGS_ENABLED: ${{ matrix.bug }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Subir ambiente com ${{ matrix.bug }} ligado
+        run: docker compose up -d --wait
+
+      - name: Rodar o seed
+        run: npm run ambiente:seed
+
+      - name: Os testes de ${{ matrix.bug }} TÊM que falhar
+        env:
+          RELATORIO_DIR: relatorio-bug
+        run: |
+          if npx playwright test --grep "@${{ matrix.bug }}"; then
+            echo "::error::A suíte NÃO detectou o ${{ matrix.bug }}: os testes marcados passaram com o bug ligado"
+            exit 1
+          fi
+          echo "A suíte detectou o ${{ matrix.bug }}: os testes marcados falharam, como esperado"
+
+      - name: Os demais testes continuam passando
+        env:
+          RELATORIO_DIR: relatorio-demais
+        run: npx playwright test --grep-invert "@${{ matrix.bug }}"
+
+      - name: Resumo da execução
+        if: always()
+        run: |
+          {
+            echo "### Prova de bugs: ${{ matrix.bug }} (API ${{ env.API_VERSION }})"
+            echo ""
+            echo "| Testes | Esperado com o bug ligado |"
+            echo "| --- | --- |"
+            echo "| \`@${{ matrix.bug }}\` | falham (a suíte detecta o defeito) |"
+            echo "| Demais | passam (o bug não afeta o resto) |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Mostrar logs se falhar
+        if: failure()
+        run: docker compose logs
+
+      - name: Guardar os relatórios (o do bug é a evidência da falha)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-${{ matrix.bug }}-api-${{ env.API_VERSION }}
+          path: |
+            relatorio-bug/
+            relatorio-demais/
+          retention-days: 30
+
+      - name: Derrubar ambiente
+        if: always()
+        run: docker compose down -v

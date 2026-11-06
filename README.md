@@ -1,5 +1,7 @@
 # agrogest-qa
 
+![QA](https://github.com/smarianglc/agrogest-qa/actions/workflows/qa.yml/badge.svg)
+
 Framework de testes da AgroGest, uma empresa **fictícia** criada para um portfólio de QA. Nenhum dado é real.
 
 Os testes rodam contra a **imagem publicada** da API (`ghcr.io/smarianglc/agrogest-api`), nunca contra o código-fonte, como num time real: cada execução diz exatamente qual versão foi testada.
@@ -47,6 +49,17 @@ O seed da API é usado **só para leitura** (personas, fazendas e o insumo da Ri
     npx playwright test --grep @BUG-01      # tem que falhar
     npm run ambiente:subir                  # volta sem bugs
 
+## CI
+
+O workflow `QA` roda a cada push na `main`, em pull requests e sob demanda (aba **Actions** → **QA** → **Run workflow**, escolhendo a versão da API).
+
+| Job | O que garante |
+| --- | --- |
+| Regressão (sem bugs) | Toda a suíte passa contra a versão da API testada |
+| Prova de bugs (BUG-01) | Com o bug ligado, os testes `@BUG-01` falham e todos os outros passam |
+
+Os relatórios HTML de cada execução ficam como artefatos do workflow por 30 dias. O relatório do job de prova de bugs é a evidência de que a suíte detecta o defeito.
+
 ## Status
 
-Fase 3: suítes de acesso e estoque concluídas (92 testes; 1 pendente para a v0.3 da API).
+Fase 4: suítes de acesso e estoque (92 testes; 1 pendente para a v0.3 da API) rodando no CI com prova de bugs.
